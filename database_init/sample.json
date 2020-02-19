@@ -1,0 +1,124 @@
+[
+    {
+        "company": "Slambda",
+        "email": "elizawright@slambda.com",
+        "latitude": 48.4862,
+        "longitude": -34.7754,
+        "name": "Jenna Luna",
+        "phone": "+1 (913) 504-2495",
+        "picture": "http://lorempixel.com/200/200/sports/8",
+        "events": [
+            {
+                "name": "Intro to Android"
+            },
+            {
+                "name": "Cup Stacking"
+            }
+        ]
+    },
+    {
+        "company": "Veraq",
+        "email": "jennaluna@veraq.com",
+        "latitude": 48.9743,
+        "longitude": -34.1247,
+        "name": "Dora Schultz",
+        "phone": "+1 (949) 580-2608",
+        "picture": "http://lorempixel.com/200/200/sports/0",
+        "events": [
+            {
+                "name": "Pitch Workshop"
+            },
+            {
+                "name": "Cup Stacking"
+            },
+            {
+                "name": "Machine Learning Workshop"
+            }
+        ]
+    },
+    {
+        "company": "Zizzle",
+        "email": "doraschultz@zizzle.com",
+        "latitude": 49.1174,
+        "longitude": -35.0231,
+        "name": "Sheri Cunningham",
+        "phone": "+1 (949) 548-2223",
+        "picture": "http://lorempixel.com/200/200/sports/5",
+        "events": [
+            {
+                "name": "Pitch Workshop"
+            },
+            {
+                "name": "Mochi Ice Cream Balls"
+            }
+        ]
+    },
+    {
+        "company": "Ezentia",
+        "email": "shericunningham@ezentia.com",
+        "latitude": 48.9288,
+        "longitude": -36.197,
+        "name": "Marla Brady",
+        "phone": "+1 (860) 504-3400",
+        "picture": "http://lorempixel.com/200/200/sports/9",
+        "events": [
+            {
+                "name": "Project Showcase"
+            },
+            {
+                "name": "Mochi Ice Cream Balls"
+            }
+        ]
+    },
+    {
+        "company": "Musaphics",
+        "email": "marlabrady@musaphics.com",
+        "latitude": 49.3844,
+        "longitude": -35.8375,
+        "name": "Baird Dixon",
+        "phone": "+1 (967) 413-2907",
+        "picture": "http://lorempixel.com/200/200/sports/7",
+        "events": [
+            {
+                "name": "API Workshop"
+            },
+            {
+                "name": "Mochi Ice Cream Balls"
+            }
+        ]
+    },
+    {
+        "company": "Frolix",
+        "email": "bairddixon@frolix.com",
+        "latitude": 48.7865,
+        "longitude": -33.9506,
+        "name": "Toni Bright",
+        "phone": "+1 (971) 493-2387",
+        "picture": "http://lorempixel.com/200/200/sports/2",
+        "events": [
+            {
+                "name": "Intro to Hardware"
+            },
+            {
+                "name": "Intro to Git"
+            },
+            {
+                "name": "Machine Learning Workshop"
+            }
+        ]
+    },
+    {
+        "company": "Nixelt",
+        "email": "tonibright@nixelt.com",
+        "latitude": 49.34,
+        "longitude": -35.9086,
+        "name": "Puckett Fletcher",
+        "phone": "+1 (895) 552-3464",
+        "picture": "http://lorempixel.com/200/200/sports/3",
+        "events": [
+            {
+                "name": "Intro to Android"
+            }
+        ]
+    }
+]
