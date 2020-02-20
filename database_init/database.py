@@ -6,21 +6,21 @@ from sqlite3 import Error
 
 
 def insert_data(cur):
-    with open('sample.json') as file:
+    with open('data.json') as file:
         # an array of dictionairies 
         data = json.load(file)
 
     for entry in data:
         # insert user 
-        cur.execute(''' INSERT INTO users(name,picture,company,email,phone)
-              VALUES(?,?,?,?,?); ''', (entry["name"], entry["picture"], entry["company"], entry["email"], entry["phone"]))
+        cur.execute(''' INSERT INTO users(name,picture,company,email,phone, latitude, longitude)
+              VALUES(?,?,?,?,?,?,?); ''', (entry["name"], entry["picture"], entry["company"], entry["email"], entry["phone"], entry["latitude"], entry["longitude"]))
         
         user_id = cur.lastrowid
 
         # insert location
-        cur.execute('''
-                    INSERT INTO location(user_id, latitude, longitude)
-                    VALUES(?,?,?); ''', (user_id, entry["latitude"], entry["longitude"]))
+        # cur.execute('''
+        #             INSERT INTO location(user_id, latitude, longitude)
+        #             VALUES(?,?,?); ''', (user_id, entry["latitude"], entry["longitude"]))
 
         for event in entry["events"]:
             event_id = None
@@ -64,8 +64,16 @@ def create_database(db_file):
                                     picture TEXT,
                                     company TEXT,
                                     email TEXT,
-                                    phone TEXT
+                                    phone TEXT,
+                                    latitude REAL NON NULL,
+                                    longitude REAL NON NULL
                                 );""")
+
+        # index to search for location
+        cur.execute("""
+            CREATE INDEX idx_user_location 
+                ON users (latitude, longitude);
+        """)
         
         # create index for longitude - lattitude 
 
@@ -83,13 +91,18 @@ def create_database(db_file):
                                     FOREIGN KEY(event_id) REFERENCES events(event_id)
                                 );""")
 
+        cur.execute("""
+            CREATE UNIQUE INDEX idx_user_event
+                ON users_events (user_id, event_id);
+        """)
+
         # create location table
-        cur.execute("""CREATE TABLE IF NOT EXISTS location (
-                                    user_id INTEGER,
-                                    latitude REAL NON NULL,
-                                    longitude REAL NON NULL,
-                                    FOREIGN KEY(user_id) REFERENCES users(user_id)
-                                );""")
+        # cur.execute("""CREATE TABLE IF NOT EXISTS location (
+        #                             user_id INTEGER,
+        #                             latitude REAL NON NULL,
+        #                             longitude REAL NON NULL,
+        #                             FOREIGN KEY(user_id) REFERENCES users(user_id)
+        #                         );""")
 
         insert_data(cur)
     except Error as e:
