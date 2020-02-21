@@ -164,6 +164,6 @@ Some things to improve/add on:
 * add a get all events api
 
 Scalable improvements:
-* If users columns grow, we should me location (lat, long) into a seperate table 
+* If users columns grow, we should move location (lat, long) into a seperate table 
 * Add layers of security if for example we don't want to user getting requests to see user locations
 
