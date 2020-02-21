@@ -1,3 +1,44 @@
+# CREATE TABLES
+CREATE_USER_TABLE = """
+    CREATE TABLE IF NOT EXISTS users (
+        user_id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        picture TEXT,
+        company TEXT,
+        email TEXT,
+        phone TEXT,
+        latitude REAL NON NULL,
+        longitude REAL NON NULL
+    )
+    """
+
+CREATE_EVENTS_TABLE = """CREATE TABLE IF NOT EXISTS events (
+        event_id INTEGER PRIMARY KEY,
+        event_name TEXT NOT NULL
+    )
+    """
+
+CREATE_USERS_EVENTS_RELATIONSHIP_TABLE = """
+    CREATE TABLE IF NOT EXISTS users_events (
+        user_id INTEGER,
+        event_id INTEGER,
+        FOREIGN KEY(user_id) REFERENCES users(user_id),
+        FOREIGN KEY(event_id) REFERENCES events(event_id)
+    )
+    """
+
+# CREATE INDEXES
+CREATE_LOCATION_IDX = """
+    CREATE INDEX idx_user_location 
+    ON users (latitude, longitude)
+    """
+
+CREATE_USER_EVENT_IDX = """
+    CREATE UNIQUE INDEX idx_user_event
+    ON users_events (user_id, event_id);
+    """
+
+# QUERIES
 INSERT_INTO_USERS_TABLE = '''
     INSERT INTO users(name,picture,company,email,phone, latitude, longitude)
     VALUES(?,?,?,?,?,?,?)
