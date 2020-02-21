@@ -1,6 +1,6 @@
 import sqlite3
 from database_init.sql_queries import *
-from flask import Flask, request, jsonify
+from flask import Flask, Response, request, jsonify
 from sqlite3 import Error
 
 conn = sqlite3.connect('database_init/hackers.db')
@@ -8,7 +8,12 @@ conn.row_factory = sqlite3.Row
 
 app = Flask(__name__)
 
-# Helper functions
+# json returned fields
+EVENT_FIELDS_FOR_USER = ["event_id", "event_name"]
+USER_FIELDS = ["user_id", "name", "picture", "email", "phone", "latitude", "longitude"]
+USER_LOCATION_FIELDS = ["user_id", "name", "latitude", "longitude"]
+
+# Helper Functions
 
 def query_db(query, args=(), one=False):
     cur = conn.cursor()
@@ -28,19 +33,21 @@ def parse_string_to_list(list_string, keys):
 
 def get_user_object(user_data, keys, addEvents = False):
     user_data = dict(user_data) # get sqlite dict from query
-    user_dict = {key: user_data[key] for key in keys}
+    user_dict = {key: (user_data[key] if key in user_data else None) for key in keys}
 
     # add events attended to user
     if addEvents:
         user_dict["attended_events"] = []
         if "events" in user_data:
-            attended_events_dict = parse_string_to_list(user_data["events"], ["event_id", "event_name"])            
+            attended_events_dict = parse_string_to_list(user_data["events"], EVENT_FIELDS_FOR_USER)            
             user_dict["attended_events"] = attended_events_dict
     
     return user_dict
 
-# Endpoints
+def get_response(status, code, message):
+    return jsonify({"{}".format(status): "{}".format(code), "message": "{}".format(message)}), code
 
+# Endpoints
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
@@ -51,7 +58,7 @@ def get_all_users():
 
     users_list = []
     for user in users_data:
-        user_dict = get_user_object(user, ["user_id", "name", "picture", "email", "phone", "latitude", "longitude"], True)
+        user_dict = get_user_object(user, USER_FIELDS, True)
         users_list.append(user_dict)
 
     return jsonify(users_list)
@@ -60,7 +67,10 @@ def get_all_users():
 def get_user(user_id):
     user_data = query_db(GET_SINGLE_USER, [user_id], True)
 
-    user_dict = get_user_object(user_data, ["name", "picture", "email", "phone", "latitude", "longitude"], True)
+    if user_data is None:
+        return get_response("error", 404, "user with id {} does not exist".format(user_id))
+
+    user_dict = get_user_object(user_data, USER_FIELDS, True)
     user_dict["user_id"] = user_id
     return jsonify(user_dict)
 
@@ -72,7 +82,7 @@ def get_users_at_location():
     range_val = float(request.args.get('range'))
 
     if range_val < 0:
-        return "ERROR: range only takes positive values"
+        return get_response("error", 400, "range value must be greater than or equal to 0")
 
     users_data = query_db(GET_USERS_FROM_LOCATION, 
         (latitude - range_val, latitude  + range_val, longitude - range_val, longitude + range_val)
@@ -80,7 +90,7 @@ def get_users_at_location():
 
     users_list = []
     for user in users_data:
-        user_dict = get_user_object(user, ["user_id", "name", "latitude", "longitude"])
+        user_dict = get_user_object(user, USER_LOCATION_FIELDS)
         users_list.append(user_dict)
     
     return jsonify(users_list)
@@ -91,6 +101,9 @@ def get_event(event_id):
 
     attendees_data = query_db(GET_ATTENDEES_INFO, [event_id])
 
+    if event_data is None:
+        return get_response("error", 404, "event with id {} does not exist".format(event_id))
+
     event_data_dict = dict(event_data)
 
     event_dict = {}
@@ -99,7 +112,7 @@ def get_event(event_id):
     
     attendees_list = []
     for attendee in attendees_data:
-        attendees_dict = get_user_object(attendee, ["name", "picture", "email", "phone", "latitude", "longitude"], False)
+        attendees_dict = get_user_object(attendee, USER_FIELDS, False)
         attendees_list.append(attendees_dict)
 
     event_dict["attendees"] = attendees_list
@@ -110,24 +123,24 @@ def get_event(event_id):
 def modify_event_attendees(event_id):
     posted_data = request.get_json()
     user_id = posted_data["user_id"]
-    response = ""
+    response = None
 
     if request.method == "POST":
         try: 
             query_db(INSERT_INTO_USERS_EVENTS_TABLE_IF_POSSIBLE, (user_id, event_id))
             conn.commit()
-            response = "Insertion complete"
+            response = Response(jsonify({"message": "Successfully added user_id {} to event_id {} \n".format(user_id, event_id)}), status=201, mimetype='application/json')
+            response.headers['location'] ='/events/{}/attendees'.format(event_id)
+
         except Error as e:
-            response = "Oops! This user has already attended this event"
+            response = get_response("code", 200, "Oops! This user has already attended this event")            
 
     elif request.method == "DELETE":
         deleted_rows = query_db(DELETE_FROM_USERS_EVENTS_TABLE, (user_id, event_id))
         conn.commit()
-        response = "Deletion complete"
+        response = get_response("code", 200, "Successfully deleted user_id {} from event_id {} \n".format(user_id, event_id))
 
     return response
-
-# error handling
 
 @app.teardown_appcontext
 def close_connection(exception):
