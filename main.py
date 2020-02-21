@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 # json returned fields
 EVENT_FIELDS_FOR_USER = ["event_id", "event_name"]
-USER_FIELDS = ["user_id", "name", "picture", "email", "phone", "latitude", "longitude"]
+USER_FIELDS = ["user_id", "name", "company", "picture", "email", "phone", "latitude", "longitude"]
 USER_LOCATION_FIELDS = ["user_id", "name", "latitude", "longitude"]
 
 # Helper Functions
@@ -157,7 +157,7 @@ def modify_event_attendees(event_id):
         try: 
             query_db(INSERT_INTO_USERS_EVENTS_TABLE_IF_POSSIBLE, (user_id, event_id))
             conn.commit()
-            response = Response(jsonify({"message": "Successfully added user_id {} to event_id {} \n".format(user_id, event_id)}), status=201, mimetype='application/json')
+            response = Response("Successfully added user_id {} to event_id {} \n".format(user_id, event_id), status=201, mimetype='application/json')
             response.headers['location'] ='/events/{}/attendees'.format(event_id)
 
         except Error as e:
